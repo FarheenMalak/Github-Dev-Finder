@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub User Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ccccd3;
+            margin: 2rem;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            font-size: 32px;
+            color: #3076c2;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .search-box {
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+        #input {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #input:focus {
+            border-color: #3076c2;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color:  #3076c2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #box {
+            display: none; /* Hide initially */
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            padding: 20px;
+        }
+        #box img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+        #box h2 {
+            font-size: 24px;
+            margin: 0 0 10px;
+        }
+        #box p {
+            margin: 5px 0;
+            color: #555;
+        }
+        #box strong {
+            color: #000;
+        }
+        img{
+            height: 10rem;
+            width: 15rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-box">
+        <h1>GitHub Dev Finder</h1>
+        <img src="images/cat.gif" alt="">
+       <div>
+        <input id="input" type="text" placeholder="Enter GitHub username">
+        <button onclick="getUser();">Search</button>
+       </div>
+    </div>
+    <div id="box"></div>
+    <script>
+        function getUser() {
+            const div = document.getElementById('box');
+            const input = document.getElementById('input');
+            let username = input.value.trim();
+            div.innerHTML = '';
+            if (!username) {
+                div.innerHTML = `<p style="color: red; text-align: center;">Please enter a valid username.</p>`;
+                return;
+            }
+            fetch(`https://api.github.com/users/${username}`)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('User not found');
+                    }
+                    return response.json();
+                })
+                .then((user) => {
+                    div.innerHTML = `
+                        <div style="text-align: center;">
+                            <img src="${user.avatar_url}" alt="Avatar">
+                            <h2>${user.name || "No Name Available"}</h2>
+                            <p>${user.bio || "No bio available"}</p>
+                            <p><strong>Public Repositories:</strong> ${user.public_repos}</p>
+                            <p><strong>Followers:</strong> ${user.followers}</p>
+                        </div>
+                    `;
+                    div.style.display = 'block'; 
+                })
+                .catch((error) => {
+                    div.innerHTML = `<p style="color: red; text-align: center;">Error: ${error.message}</p>`;
+                    div.style.display = 'block'; 
+                });
+        }
+    </script>
+</body>
+</html>
